@@ -184,7 +184,7 @@ def main(_input):
 
 @app.post("/rating")
 def rating(input: InputModel):
-    main(input.dict())
+    return main(input.dict())
 
 app.mount("/static", StaticFiles(directory="./data"), name="static")
 
