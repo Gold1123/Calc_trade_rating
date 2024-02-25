@@ -179,7 +179,7 @@ _input = {
   "Relative Strength Index 2": {"Active": "Yes", "Period": 14, "MA Lower Period": 9, "MA Higher Period": 25},
   "Relative Strength Index 3": {"Active": "Yes", "Period": 14, "MA Lower Period": 9, "MA Higher Period": 25},
   "Stochastic": {"Active": "Yes", "K%": 14, "D%": 3},
-  "MACD": {"Active": "Yes", "Period1": 12, "Period2": 26, "Period3": 9},
+  "MACD": {"Active": "Yes", "Period1": 12, "Period2": 25, "Period3": 9},
   "MA Threshold": 0.5,
   "Stochastic Threshold": 0.4,
   "MACD Threshold": 0.5
