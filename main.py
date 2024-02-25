@@ -17,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+output_file = ""
 df = []
 # rsi_period_1 = 7  # Example RSI period
 # rsi_period_2 = 14  # Example RSI period
@@ -163,7 +164,8 @@ def calc_output(last_row):
     
     
 def main(Symbol):
-    global df
+    global df, output_file
+    output_file = Symbol
     # Download historical stock price data
     print(Symbol)
     df = yf.download(Symbol, start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
@@ -198,6 +200,7 @@ def rating(_input: InputModel):
     for stock in stock_list:
         ans.append(main(stock))
     stock_csv["Rating"] = ans
+    df.to_csv(f'./data/{output_file}.csv', index=False)
     stock_csv.to_csv('./data/output.csv', index=False)
 
 @app.post("/upload")
