@@ -85,7 +85,7 @@ def calc_output(last_row):
                 if MA_diff > MA_threshold:
                     score += 1
                 elif MA_diff <= MA_threshold and MA_diff >= 0:
-                    continue
+                    pass
                 else:
                     score -= 1
                     
@@ -97,7 +97,7 @@ def calc_output(last_row):
         if CRS_diff > CRS_threshold:
             score += 1
         elif CRS_diff <= CRS_threshold and CRS_diff >= 0:
-            continue
+            pass
         else:
             score -= 1
         
@@ -110,7 +110,7 @@ def calc_output(last_row):
             if RSI_diff > RSI_threshold:
                 score += 1
             elif RSI_diff <= RSI_threshold and RSI_diff >= 0:
-                continue
+                pass
             else:
                 score -= 1
             
@@ -122,7 +122,7 @@ def calc_output(last_row):
         if Sto_diff > Sto_threshold:
             score += 1
         elif Sto_diff <= Sto_threshold and Sto_diff >= 0:
-            continue
+            pass
         else:
             score -= 1
               
