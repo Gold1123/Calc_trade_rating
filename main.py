@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-import app.Routers.Chatbot as Chatbot
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import talib
