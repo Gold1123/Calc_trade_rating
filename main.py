@@ -73,6 +73,7 @@ def calc_Stochastic(key, value):
                                                     slowd_matype=0 # the type of moving average for the slow %D line. A value of 0 specifies a simple moving average.
                                                 )
     except Exception as e:
+        print(df[['High', 'Low', 'Close']])
         print(e)
         
 
