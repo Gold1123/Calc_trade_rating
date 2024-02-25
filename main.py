@@ -80,7 +80,7 @@ def calc_output(last_row):
         for j in range(i+1, 6):
             if input[f"Moving Average {i}"]["Active"] == "Yes" and input[f"Moving Average {j}"]["Active"] == "Yes":
                 active_count += 1
-                MA_diff = last_row[f"MA_{i}"] - last_row[f"MA_{j}"] # difference between MA_i and MA_j
+                MA_diff = int(last_row[f"MA_{i}"] - last_row[f"MA_{j}"]) # difference between MA_i and MA_j
                 print(type(MA_diff))
                 MA_threshold = input["MA Threshold"] # MA Threshold
                 if MA_diff > MA_threshold:
