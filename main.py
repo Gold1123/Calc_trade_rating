@@ -6,7 +6,7 @@ import talib
 import yfinance as yf
 import pandas as pd
 from model import InputModel
-
+import shutil
 app = FastAPI()
 
 app.add_middleware(
@@ -157,7 +157,7 @@ def calc_output(last_row):
     return score / active_count
     
     
-def main(_input, filename):
+def main(_input):
     global df, input
     input = _input
     stock_csv = pd.read_csv(f"./data/{input['InputFile']}");
@@ -195,7 +195,7 @@ def rating(file: UploadFile = Form(...)):
 
 app.mount("/static", StaticFiles(directory="./data"), name="static")
 
-@app.get("/", tags=["Root"])
+@app.post("/", tags=["Root"])
 async def root():
     return {"message": "Hello World"}
 
