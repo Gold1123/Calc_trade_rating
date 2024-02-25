@@ -64,13 +64,17 @@ def calc_Stochastic(key, value):
     d_period = value["D%"]   # The time period for %D (usually a simple moving average of %K)
 
     # Calculate the Stochastic Oscillator
-    df['Sto_main'], df['Sto_signal'] = talib.STOCH(df['High'], df['Low'], df['Close'], 
-                                                fastk_period=k_period, # the time period for the fast %K line.
-                                                slowk_period=d_period, # the time period for the slow %K line, which is a smoothed version of the fast %K.
-                                                slowk_matype=0, # the type of moving average for the slow %K line. A value of 0 specifies a simple moving average. 
-                                                slowd_period=d_period, # the time period for the slow %D line, which is a moving average of the slow %K line.
-                                                slowd_matype=0 # the type of moving average for the slow %D line. A value of 0 specifies a simple moving average.
-                                            )
+    try:
+        df['Sto_main'], df['Sto_signal'] = talib.STOCH(df['High'], df['Low'], df['Close'], 
+                                                    fastk_period=k_period, # the time period for the fast %K line.
+                                                    slowk_period=d_period, # the time period for the slow %K line, which is a smoothed version of the fast %K.
+                                                    slowk_matype=0, # the type of moving average for the slow %K line. A value of 0 specifies a simple moving average. 
+                                                    slowd_period=d_period, # the time period for the slow %D line, which is a moving average of the slow %K line.
+                                                    slowd_matype=0 # the type of moving average for the slow %D line. A value of 0 specifies a simple moving average.
+                                                )
+    except Exception as e:
+        print()
+        
 
 def calc_MACD(key, value):
     if value["Active"] == "No":
@@ -160,6 +164,7 @@ def calc_output(last_row):
 def main(Symbol):
     global df
     # Download historical stock price data
+    print(Symbol)
     df = yf.download(Symbol, start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
 
     calc_MA("MA_1", input["Moving_Average_1"])
