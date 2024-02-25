@@ -198,7 +198,7 @@ def rating(_input: InputModel):
     for stock in stock_list:
         ans.append(main(stock))
     stock_csv["Rating"] = ans
-    df.to_csv('./data/output.csv', index=False)
+    stock_csv.to_csv('./data/output.csv', index=False)
 
 @app.post("/upload")
 def rating(file: UploadFile = Form(...)):
