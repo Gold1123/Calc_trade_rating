@@ -1,6 +1,21 @@
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+import app.Routers.Chatbot as Chatbot
+import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 import talib
 import yfinance as yf
 import pandas as pd
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 df = []
 # rsi_period_1 = 7  # Example RSI period
@@ -78,11 +93,10 @@ def calc_output(last_row):
     #------------------------ MA Score ---------------------------
     for i in range(1, 6):
         for j in range(i+1, 6):
-            if input[f"Moving Average {i}"]["Active"] == "Yes" and input[f"Moving Average {j}"]["Active"] == "Yes":
+            if input[f"Moving_Average_{i}"]["Active"] == "Yes" and input[f"Moving_Average_{j}"]["Active"] == "Yes":
                 active_count += 1
                 MA_diff = last_row[f"MA_{i}"].iloc[-1] - last_row[f"MA_{j}"].iloc[-1] # difference between MA_i and MA_j
-                print(type(MA_diff))
-                MA_threshold = input["MA Threshold"] # MA Threshold
+                MA_threshold = input["MA_Threshold"] # MA Threshold
                 if MA_diff > MA_threshold:
                     score += 1
                 elif MA_diff <= MA_threshold and MA_diff >= 0:
@@ -91,7 +105,7 @@ def calc_output(last_row):
                     score -= 1
                     
     # ----------------------- CRS Score ---------------------------
-    if input["Comparative Relative Strength"]["Active"] == "Yes":
+    if input["Comparative_Relative_Strength"]["Active"] == "Yes":
         active_count += 1
         CRS_diff = last_row["CRSMAL"].iloc[-1] - last_row["CRSMAH"].iloc[-1]
         CRS_threshold = 0 # CRS Threshold
@@ -104,7 +118,7 @@ def calc_output(last_row):
         
     #---------------------- RSI Score ----------------------------
     for i in range(1, 4):
-        if input[f"Relative Strength Index {i}"]["Active"] == "Yes":
+        if input[f"Relative_Strength_Index_{i}"]["Active"] == "Yes":
             active_count += 1
             RSI_diff = last_row[f"RSI{i}MAL"].iloc[-1] - last_row[f"RSI{i}MAH"].iloc[-1]
             RSI_threshold = 0 # RSI Threshold
@@ -119,7 +133,7 @@ def calc_output(last_row):
     if input["Stochastic"]["Active"] == "Yes":
         active_count += 1
         Sto_diff = last_row["Sto_signal"].iloc[-1] - last_row["Sto_main"].iloc[-1]
-        Sto_threshold = input["Stochastic Threshold"] # Sto Threshold
+        Sto_threshold = input["Stochastic_Threshold"] # Sto Threshold
         if Sto_diff > Sto_threshold:
             score += 1
         elif Sto_diff <= Sto_threshold and Sto_diff >= 0:
@@ -131,7 +145,7 @@ def calc_output(last_row):
     if input["MACD"]["Active"] == "Yes":
         active_count += 1
         MACD_diff = last_row["MACD_signal"].iloc[-1] - last_row["MACD"].iloc[-1]
-        MACD_threshold = input["MACD Threshold"] # Sto Threshold
+        MACD_threshold = input["MACD_Threshold"] # MACD Threshold
         if MACD_diff > MACD_threshold:
             score += 1
         elif MACD_diff <= MACD_threshold and MACD_diff >= 0:
@@ -140,7 +154,7 @@ def calc_output(last_row):
             score -= 1
     
     print(active_count, " ", score)
-    return score
+    return score / active_count
     
     
 def main(_input):
@@ -149,15 +163,15 @@ def main(_input):
     # Download historical stock price data
     df = yf.download("MSFT", start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
 
-    calc_MA("MA_1", input["Moving Average 1"])
-    calc_MA("MA_2", input["Moving Average 2"])
-    calc_MA("MA_3", input["Moving Average 3"])
-    calc_MA("MA_4", input["Moving Average 4"])
-    calc_MA("MA_5", input["Moving Average 5"])
-    calc_RSI("RSI1", input["Relative Strength Index 1"])
-    calc_RSI("RSI2", input["Relative Strength Index 1"])
-    calc_RSI("RSI3", input["Relative Strength Index 1"])
-    calc_CRS("CRS", input["Comparative Relative Strength"])
+    calc_MA("MA_1", input["Moving_Average_1"])
+    calc_MA("MA_2", input["Moving_Average_2"])
+    calc_MA("MA_3", input["Moving_Average_3"])
+    calc_MA("MA_4", input["Moving_Average_4"])
+    calc_MA("MA_5", input["Moving_Average_5"])
+    calc_RSI("RSI1", input["Relative_Strength_Index_1"])
+    calc_RSI("RSI2", input["Relative_Strength_Index_2"])
+    calc_RSI("RSI3", input["Relative_Strength_Index_3"])
+    calc_CRS("CRS", input["Comparative_Relative_Strength"])
     calc_Stochastic("Stochastic", input["Stochastic"])
     calc_MACD("MACD", input["MACD"])
     
@@ -168,23 +182,12 @@ def main(_input):
     
     print(last_row)
 
-_input = {
-  "Timeframe": "1D",
-  "Moving Average 1": {"Active": "Yes", "Period": 20},
-  "Moving Average 2": {"Active": "Yes", "Period": 50},
-  "Moving Average 3": {"Active": "Yes", "Period": 100},
-  "Moving Average 4": {"Active": "Yes", "Period": 150},
-  "Moving Average 5": {"Active": "Yes", "Period": 200},
-  "Comparative Relative Strength": {"Active": "Yes", "Period": 14, "Compare Symbol": "SPY", "MA Lower Period": 50, "MA Higher Period": 200},
-  "Relative Strength Index 1": {"Active": "Yes", "Period": 14, "MA Lower Period": 9, "MA Higher Period": 25},
-  "Relative Strength Index 2": {"Active": "Yes", "Period": 14, "MA Lower Period": 9, "MA Higher Period": 25},
-  "Relative Strength Index 3": {"Active": "Yes", "Period": 14, "MA Lower Period": 9, "MA Higher Period": 25},
-  "Stochastic": {"Active": "Yes", "K%": 14, "D%": 3},
-  "MACD": {"Active": "Yes", "Period1": 12, "Period2": 25, "Period3": 9},
-  "MA Threshold": 0.5,
-  "Stochastic Threshold": 0.4,
-  "MACD Threshold": 0.5
-  
-}
+@app.post("/rating")
+def rating(input: InputModel):
+    main(input)
 
-main(_input)
+app.mount("/static", StaticFiles(directory="./data"), name="static")
+
+@app.get("/", tags=["Root"])
+async def root():
+    return {"message": "Hello World"}
