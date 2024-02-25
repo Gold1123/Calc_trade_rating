@@ -187,7 +187,8 @@ def rating(_input: InputModel):
     stock_csv = pd.read_csv(f"./data/{input['InputFile']}")
     stock_list = stock_csv["Symbol"].tolist()
     print(stock_list)
-    return main()
+    for stock in stock_list:
+        main(stock)
 
 @app.post("/upload")
 def rating(file: UploadFile = Form(...)):
