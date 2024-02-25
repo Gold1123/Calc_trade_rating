@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 class InputModel(BaseModel):
+    InputFile: str
     Timeframe: str
     Moving_Average_1: dict
     Moving_Average_2: dict

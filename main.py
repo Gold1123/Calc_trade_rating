@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, Form
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
@@ -157,9 +157,10 @@ def calc_output(last_row):
     return score / active_count
     
     
-def main(_input):
+def main(_input, filename):
     global df, input
     input = _input
+    stock_csv = pd.read_csv(f"./data/{input['InputFile']}");
     # Download historical stock price data
     df = yf.download("MSFT", start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
 
@@ -186,8 +187,17 @@ def main(_input):
 def rating(input: InputModel):
     return main(input.dict())
 
+@app.post("/upload")
+def rating(file: UploadFile = Form(...)):
+    print(file)
+    with open(f"./data/{file.filename}", "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
 app.mount("/static", StaticFiles(directory="./data"), name="static")
 
 @app.get("/", tags=["Root"])
 async def root():
     return {"message": "Hello World"}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=7000, reload=True)
