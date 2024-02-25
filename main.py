@@ -158,6 +158,7 @@ def calc_output(last_row):
     
     
 def main(Symbol):
+    global df
     # Download historical stock price data
     df = yf.download(Symbol, start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
 
@@ -182,14 +183,14 @@ def main(Symbol):
 
 @app.post("/rating")
 def rating(_input: InputModel):
-    global df, input
+    global input
     input = _input.dict()
     stock_csv = pd.read_csv(f"./data/{input['InputFile']}")
     stock_list = stock_csv["Symbol"].tolist()
     print("stocK: ", stock_list)
-    return
+    ans = []
     for stock in stock_list:
-        main(stock)
+        ans.append(main(stock))
 
 @app.post("/upload")
 def rating(file: UploadFile = Form(...)):
