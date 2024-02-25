@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import talib
 import yfinance as yf
 import pandas as pd
+from model import InputModel
 
 app = FastAPI()
 
