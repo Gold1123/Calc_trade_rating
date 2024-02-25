@@ -26,7 +26,7 @@ def calc_RSI(key, value):
         return
     
     df[key] = talib.RSI(df['Close'], timeperiod=value["Period"])
-    df[f'{key}MAL'] = df[key].rolling(window=value["MA Lower Period"][]).mean()
+    df[f'{key}MAL'] = df[key].rolling(window=value["MA Lower Period"]).mean()
     df[f'{key}MAH'] = df[key].rolling(window=value["MA Higher Period"]).mean()
     
 
