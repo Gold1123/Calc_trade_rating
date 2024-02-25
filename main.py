@@ -157,12 +157,9 @@ def calc_output(last_row):
     return score / active_count
     
     
-def main(_input):
-    global df, input
-    input = _input
-    stock_csv = pd.read_csv(f"./data/{input['InputFile']}");
+def main(Symbol):
     # Download historical stock price data
-    df = yf.download("MSFT", start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
+    df = yf.download(Symbol, start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
 
     calc_MA("MA_1", input["Moving_Average_1"])
     calc_MA("MA_2", input["Moving_Average_2"])
@@ -184,12 +181,16 @@ def main(_input):
     print(last_row)
 
 @app.post("/rating")
-def rating(input: InputModel):
-    return main(input.dict())
+def rating(_input: InputModel):
+    global df, input
+    input = _input.dict()
+    stock_csv = pd.read_csv(f"./data/{input['InputFile']}")
+    stock_list = stock_csv["Symbol"].tolist()
+    print(stock_list)
+    return main()
 
 @app.post("/upload")
 def rating(file: UploadFile = Form(...)):
-    print(file)
     with open(f"./data/{file.filename}", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
