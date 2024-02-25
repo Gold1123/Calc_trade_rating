@@ -33,7 +33,7 @@ def calc_RSI(key, value):
 def calc_CRS(key, value):
     if value["Active"] == "No":
         return
-    compare_df = yf.download(value["Compare Symbol"], start="2023-11-01", end="2024-02-23", interval=input["Timeframe"])
+    compare_df = yf.download(value["Compare Symbol"], start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
     df['Compare_Close'] = compare_df['Close']
     df["CRS"] = df['Close'] / df['Compare_Close']
     
@@ -93,7 +93,7 @@ def calc_output(last_row):
     # ----------------------- CRS Score ---------------------------
     if input["Comparative Relative Strength"]["Active"] == "Yes":
         active_count += 1
-        CRS_diff = last_row["CRSMAL"] - last_row["CRSMAH"]
+        CRS_diff = last_row["CRSMAL"].iloc[-1] - last_row["CRSMAH"].iloc[-1]
         CRS_threshold = 0 # CRS Threshold
         if CRS_diff > CRS_threshold:
             score += 1
@@ -106,7 +106,7 @@ def calc_output(last_row):
     for i in range(1, 4):
         if input[f"Relative Strength Index {i}"]["Active"] == "Yes":
             active_count += 1
-            RSI_diff = last_row[f"RSI{i}MAL"] - last_row[f"RSI{i}MAH"]
+            RSI_diff = last_row[f"RSI{i}MAL"].iloc[-1] - last_row[f"RSI{i}MAH"].iloc[-1]
             RSI_threshold = 0 # RSI Threshold
             if RSI_diff > RSI_threshold:
                 score += 1
@@ -118,7 +118,7 @@ def calc_output(last_row):
     #---------------------- Stochastic Score ----------------------------
     if input["Stochastic"]["Active"] == "Yes":
         active_count += 1
-        Sto_diff = last_row["Sto_signal"] - last_row["Sto_main"]
+        Sto_diff = last_row["Sto_signal"].iloc[-1] - last_row["Sto_main"].iloc[-1]
         Sto_threshold = input["Stochastic Threshold"] # Sto Threshold
         if Sto_diff > Sto_threshold:
             score += 1
@@ -130,7 +130,7 @@ def calc_output(last_row):
     #---------------------- MACD Score ----------------------------
     if input["MACD"]["Active"] == "Yes":
         active_count += 1
-        MACD_diff = last_row["MACD_signal"] - last_row["MACD"]
+        MACD_diff = last_row["MACD_signal"].iloc[-1] - last_row["MACD"].iloc[-1]
         MACD_threshold = input["MACD Threshold"] # Sto Threshold
         if MACD_diff > MACD_threshold:
             score += 1
@@ -147,7 +147,7 @@ def main(_input):
     global df, input
     input = _input
     # Download historical stock price data
-    df = yf.download("MSFT", start="2023-11-01", end="2024-02-23", interval=input["Timeframe"])
+    df = yf.download("MSFT", start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
 
     calc_MA("MA_1", input["Moving Average 1"])
     calc_MA("MA_2", input["Moving Average 2"])
