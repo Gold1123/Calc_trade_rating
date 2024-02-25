@@ -26,7 +26,7 @@ def calc_RSI(key, value):
         return
     
     df[key] = talib.RSI(df['Close'], timeperiod=value["Period"])
-    df[f'{key}MAL'] = df[key].rolling(window=value["MA Lower Period"]).mean()
+    df[f'{key}MAL'] = df[key].rolling(window=value["MA Lower Period"][]).mean()
     df[f'{key}MAH'] = df[key].rolling(window=value["MA Higher Period"]).mean()
     
 
@@ -78,7 +78,7 @@ def calc_output(last_row):
     #------------------------ MA Score ---------------------------
     for i in range(1, 6):
         for j in range(i+1, 6):
-            if input[f"Moving Average {i}"] == "Yes" and input[f"Moving Average {j}"] == "Yes":
+            if input[f"Moving Average {i}"]["Active"] == "Yes" and input[f"Moving Average {j}"]["Active"] == "Yes":
                 active_count += 1
                 MA_diff = last_row[f"MA_{i}"] - last_row[f"MA_{j}"] # difference between MA_i and MA_j
                 MA_threshold = input["MA Threshold"] # MA Threshold
@@ -90,7 +90,7 @@ def calc_output(last_row):
                     score -= 1
                     
     # ----------------------- CRS Score ---------------------------
-    if input["Comparative Relative Strength"] == "Yes":
+    if input["Comparative Relative Strength"]["Active"] == "Yes":
         active_count += 1
         CRS_diff = last_row["CRSMAL"] - last_row["CRSMAH"]
         CRS_threshold = 0 # CRS Threshold
@@ -103,7 +103,7 @@ def calc_output(last_row):
         
     #---------------------- RSI Score ----------------------------
     for i in range(1, 4):
-        if input[f"Relative Strength Index {i}"] == "Yes":
+        if input[f"Relative Strength Index {i}"]["Active"] == "Yes":
             active_count += 1
             RSI_diff = last_row[f"RSI{i}MAL"] - last_row[f"RSI{i}MAH"]
             RSI_threshold = 0 # RSI Threshold
@@ -115,7 +115,7 @@ def calc_output(last_row):
                 score -= 1
             
     #---------------------- Stochastic Score ----------------------------
-    if input["Stochastic"] == "Yes":
+    if input["Stochastic"]["Active"] == "Yes":
         active_count += 1
         Sto_diff = last_row["Sto_signal"] - last_row["Sto_main"]
         Sto_threshold = input["Stochastic Threshold"] # Sto Threshold
@@ -127,7 +127,7 @@ def calc_output(last_row):
             score -= 1
               
     #---------------------- MACD Score ----------------------------
-    if input["MACD"] == "Yes":
+    if input["MACD"]["Active"] == "Yes":
         active_count += 1
         MACD_diff = last_row["MACD_signal"] - last_row["MACD"]
         MACD_threshold = input["MACD Threshold"] # Sto Threshold
