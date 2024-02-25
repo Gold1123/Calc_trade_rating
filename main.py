@@ -134,7 +134,7 @@ def calc_output(last_row):
         if MACD_diff > MACD_threshold:
             score += 1
         elif MACD_diff <= MACD_threshold and MACD_diff >= 0:
-            continue
+            pass
         else:
             score -= 1
     
