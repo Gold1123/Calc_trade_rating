@@ -186,7 +186,8 @@ def rating(_input: InputModel):
     input = _input.dict()
     stock_csv = pd.read_csv(f"./data/{input['InputFile']}")
     stock_list = stock_csv["Symbol"].tolist()
-    print(stock_list)
+    print("stocK: ", stock_list)
+    return
     for stock in stock_list:
         main(stock)
 
