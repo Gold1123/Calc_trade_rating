@@ -210,7 +210,7 @@ def rating(file: UploadFile = Form(...)):
         shutil.copyfileobj(file.file, buffer)
     return True
 
-app.mount("/get_answer", StaticFiles(directory="./data"), name="static")
+app.mount("/get-answer", StaticFiles(directory="./data"), name="static")
 
 @app.post("/", tags=["Root"])
 async def root():
