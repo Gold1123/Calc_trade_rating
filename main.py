@@ -202,11 +202,13 @@ def rating(_input: InputModel):
         df.to_csv(f'./data/{output_file}.csv', index=False)
     stock_csv["Rating"] = ans
     stock_csv.to_csv('./data/output.csv', index=False)
+    return True
 
 @app.post("/upload")
 def rating(file: UploadFile = Form(...)):
     with open(f"./data/{file.filename}", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+    return True
 
 app.mount("/static", StaticFiles(directory="./data"), name="static")
 
