@@ -1,34 +1,6 @@
-from fastapi import FastAPI, UploadFile, Form
-from fastapi.staticfiles import StaticFiles
-import uvicorn
-from fastapi.middleware.cors import CORSMiddleware
 import talib
 import yfinance as yf
 import pandas as pd
-from model import InputModel
-import shutil
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-output_file = ""
-df = []
-# rsi_period_1 = 7  # Example RSI period
-# rsi_period_2 = 14  # Example RSI period
-# rsi_period_3 = 21  # Example RSI period
-
-# ma_lower_period = 14  # Example MA Lower period
-# ma_higher_period = 21  # Example MA Higher period
-# compare_symbol = "^GSPC"
-
-input = {}
-
 
 def calc_MA(key, value):
     if value["Active"] == "No":
@@ -161,60 +133,3 @@ def calc_output(last_row):
     
     print(active_count, " ", score)
     return score / active_count
-    
-    
-def main(Symbol):
-    global df, output_file
-    output_file = Symbol
-    # Download historical stock price data
-    print(Symbol)
-    df = yf.download(Symbol, start="2023-01-01", end="2024-02-23", interval=input["Timeframe"])
-
-    calc_MA("MA_1", input["Moving_Average_1"])
-    calc_MA("MA_2", input["Moving_Average_2"])
-    calc_MA("MA_3", input["Moving_Average_3"])
-    calc_MA("MA_4", input["Moving_Average_4"])
-    calc_MA("MA_5", input["Moving_Average_5"])
-    calc_RSI("RSI1", input["Relative_Strength_Index_1"])
-    calc_RSI("RSI2", input["Relative_Strength_Index_2"])
-    calc_RSI("RSI3", input["Relative_Strength_Index_3"])
-    calc_CRS("CRS", input["Comparative_Relative_Strength"])
-    calc_Stochastic("Stochastic", input["Stochastic"])
-    calc_MACD("MACD", input["MACD"])
-    
-    last_row = df.tail(1)
-    
-    return calc_output(last_row)
-    
-    
-    print(last_row)
-
-@app.post("/rating")
-def rating(_input: InputModel):
-    global input
-    input = _input.dict()
-    stock_csv = pd.read_csv(f"./data/{input['InputFile']}")
-    stock_list = stock_csv["Symbol"].tolist()
-    print("stocK: ", stock_list)
-    ans = []
-    for stock in stock_list:
-        ans.append(main(stock))
-        df.to_csv(f'./data/{output_file}.csv', index=False)
-    stock_csv["Rating"] = ans
-    stock_csv.to_csv('./data/output.csv', index=False)
-    return True
-
-@app.post("/upload")
-def rating(file: UploadFile = Form(...)):
-    with open(f"./data/{file.filename}", "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return True
-
-app.mount("/get-answer", StaticFiles(directory="./data"), name="static")
-
-@app.post("/", tags=["Root"])
-async def root():
-    return {"message": "Hello World"}
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=7000, reload=True)
