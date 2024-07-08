@@ -4,17 +4,6 @@ import talib
 import yfinance as yf
 import pandas as pd
 
-def Check_Crossover_Crossdown(Values_1, Values_2, Th):
-    if Values_1 == None or Values_2 == None:
-        return None
-    
-    if Values_1[-2] < Values_2[-2] and Values_1[-1] > Values_2[-1] and (Values_1[-1] - Values_2[-1]) > Th:
-        return 1
-    elif Values_1[-2] > Values_2[-2] and Values_1[-1] < Values_2[-1] and (Values_1[-1] - Values_2[-1]) < -Th:
-        return -1
-    else:
-        return 0
-
 class MovingAverageModel:
     Active: Optional[str] = "No"
     Period: int = 20
@@ -25,7 +14,7 @@ class MovingAverageModel:
         
     def Calc_MA(self, DataFrame):
         if self.Active == "No":
-            return None
+            return pd.DataFrame()
         return DataFrame['Close'].rolling(window=self.Period).mean()
     
 
@@ -43,7 +32,7 @@ class RSIModel:
         
     def Calc_RSI(self, DataFrame):
         if self.Active == "No":
-            return None
+            return pd.DataFrame()
         
         RSI = talib.RSI(DataFrame['Close'], timeperiod=self.Period)
         RSIMAL = RSI.rolling(window=self.MA_Lower_Period).mean()
@@ -72,7 +61,7 @@ class CRSModel:
         
     def Calc_CRS(self, DataFrame):
         if self.Active == "No":
-            return None
+            return pd.DataFrame()
         
         Compare_Close = self.Compare_DF['Close']
         CRS = DataFrame['Close'] / Compare_Close
@@ -94,7 +83,7 @@ class StochasticModel:
         
     def Calc_Stochastic(self, DataFrame):
         if self.Active == "No":
-            return None
+            return pd.DataFrame()
         
         # Calculate the Stochastic Oscillator
         try:
@@ -127,7 +116,7 @@ class MACDModel:
         
     def Calc_MACD(self, DataFrame):
         if self.Active == "No":
-            return None
+            return pd.DataFrame()
         
         # Calculate the MACD and the signal line
         MACD, MACD_signal, _ = talib.MACD(
@@ -138,3 +127,14 @@ class MACDModel:
         )
         return {"MACD": MACD, "MACD_signal": MACD_signal}
 
+
+def Check_Crossover_Crossdown(Values_1, Values_2, Th):
+    if Values_1.empty or Values_2.empty:
+        return None
+    
+    if Values_1[-2] < Values_2[-2] and Values_1[-1] > Values_2[-1] and (Values_1[-1] - Values_2[-1]) > Th:
+        return 1
+    elif Values_1[-2] > Values_2[-2] and Values_1[-1] < Values_2[-1] and (Values_1[-1] - Values_2[-1]) < -Th:
+        return -1
+    else:
+        return 0

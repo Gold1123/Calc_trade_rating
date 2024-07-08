@@ -1,10 +1,10 @@
 import shutil
 import yfinance as yf
-
+import pandas as pd
 from Utility import MovingAverageModel, RSIModel, CRSModel, StochasticModel, MACDModel, Check_Crossover_Crossdown
 
 
-File_Name = "test.csv"
+File_Name = "test list.csv"
 
 
 TimeFrame = '1D'
@@ -70,8 +70,8 @@ MACD_Threshold = 2
 Score = 0
 Count = 0
 
-def Update_Score_Count(Value_1, Value_2):
-    result = Check_Crossover_Crossdown(Value_1, Value_2)
+def Update_Score_Count(Value_1, Value_2, Th):
+    result = Check_Crossover_Crossdown(Value_1, Value_2, Th)
     Score += result if result != None else 0
     Count += 1 if result != None else 0
 
@@ -93,46 +93,46 @@ def Calc_Rating(Symbol):
     MA_5 = MovingAverageModel(MA_5_Active, MA_5_Period)
     ma_5 = MA_5.Calc_MA(DataFrame)
     
-    Update_Score_Count(ma_1, ma_2)
-    Update_Score_Count(ma_1, ma_3)
-    Update_Score_Count(ma_1, ma_4)
-    Update_Score_Count(ma_1, ma_5)
-    Update_Score_Count(ma_2, ma_3)
-    Update_Score_Count(ma_2, ma_4)
-    Update_Score_Count(ma_2, ma_5)
-    Update_Score_Count(ma_3, ma_4)
-    Update_Score_Count(ma_3, ma_5)
-    Update_Score_Count(ma_4, ma_5)
+    Update_Score_Count(ma_1, ma_2, MA_Threshold)
+    Update_Score_Count(ma_1, ma_3, MA_Threshold)
+    Update_Score_Count(ma_1, ma_4, MA_Threshold)
+    Update_Score_Count(ma_1, ma_5, MA_Threshold)
+    Update_Score_Count(ma_2, ma_3, MA_Threshold)
+    Update_Score_Count(ma_2, ma_4, MA_Threshold)
+    Update_Score_Count(ma_2, ma_5, MA_Threshold)
+    Update_Score_Count(ma_3, ma_4, MA_Threshold)
+    Update_Score_Count(ma_3, ma_5, MA_Threshold)
+    Update_Score_Count(ma_4, ma_5, MA_Threshold)
     
     
     RSI_1 = RSIModel(RSI_1_Active, RSI_1_Period, RSI_1_MA_LP, RSI_1_MA_HP)
     rsi_1 = RSI_1.Calc_RSI(DataFrame)
-    Update_Score_Count(rsi_1['RSIMAL'], rsi_1['RSIMAH'])
+    Update_Score_Count(rsi_1['RSIMAL'], rsi_1['RSIMAH'], RSI_Threshold)
     
     
     RSI_2 = RSIModel(RSI_2_Active, RSI_2_Period, RSI_2_MA_LP, RSI_2_MA_HP)
     rsi_2 = RSI_2.Calc_RSI(DataFrame)
-    Update_Score_Count(rsi_2['RSIMAL'], rsi_2['RSIMAH'])
+    Update_Score_Count(rsi_2['RSIMAL'], rsi_2['RSIMAH'], RSI_Threshold)
     
     
     RSI_3 = RSIModel(RSI_3_Active, RSI_3_Period, RSI_3_MA_LP, RSI_3_MA_HP)
     rsi_3 = RSI_3.Calc_RSI(DataFrame)
-    Update_Score_Count(rsi_3['RSIMAL'], rsi_3['RSIMAH'])
+    Update_Score_Count(rsi_3['RSIMAL'], rsi_3['RSIMAH'], RSI_Threshold)
 
     
     CRS = CRSModel(CRS_Active, CRS_Period, CRS_Compare, CRS_MA_LP, CRS_MA_HP, TimeFrame)
     crs = CRS.Calc_CRS(DataFrame)['CRSMAH']
-    Update_Score_Count(crs['CRSMAL'], crs['CRSMAH'])
+    Update_Score_Count(crs['CRSMAL'], crs['CRSMAH'], CRS_Threshold)
     
     
     Stochastic = StochasticModel(Stochastic_Active, Stochastic_K_Period, Stochastic_D_Period)
     stochastic = Stochastic.Calc_Stochastic(DataFrame)
-    Update_Score_Count(stochastic['Sto_main'], stochastic['Sto_signal'])
+    Update_Score_Count(stochastic['Sto_main'], stochastic['Sto_signal'], Stochastic_Threshold)
     
     
     MACD = MACDModel(MACD_Active, MACD_Period1, MACD_Period2, MACD_Period3)
     macd = MACD.Calc_MACD(DataFrame)
-    Update_Score_Count(macd['MACD'], macd['MACD_signal'])
+    Update_Score_Count(macd['MACD'], macd['MACD_signal'], MACD_Threshold)
     
     return Score / Count
 
@@ -144,7 +144,7 @@ stock_list = stock_csv["Symbol"].tolist()
 rating_list = []
 
 for stock in stock_list:
-    rating_list.append(Calc_Rating("MTUM"))
-stock_csv[Time] = ans
+    rating_list.append(Calc_Rating(stock))
+stock_csv[Time] = rating_list
 stock_csv.to_csv(Input_Data_Path, index=False)
 
